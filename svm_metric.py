@@ -2,7 +2,7 @@ import os
 import csv
 from sklearn import svm
 import numpy as np
-import gc
+from sklearn import preprocessing
 
 POS_1_LINE_COUNT = 9744
 POS_2_LINE_COUNT = 19481
@@ -56,17 +56,15 @@ print 'total {0} genes without control'.format(total_genes_count)
 all_sample_genes = gene_to_data.keys()
 all_sample_genes = ['positive_1'] * 10 + ['positive_2'] * 10 + ['negative'] * 10 + all_sample_genes
 
-try_count = 1000
+try_count = 10
 
 distance_metric = [None] * try_count
 for i in xrange(0, try_count):
-	distance_metric[i] = [0.0] * try_count
+	distance_metric[i] = [0.5] * try_count
 
 print "Done initializing distance metric"
 
 
-clf = svm.LinearSVC()
-distance = {}
 for i in xrange(0, try_count):
 	print "processing row {0}".format(i)
 
@@ -101,27 +99,49 @@ for i in xrange(0, try_count):
 				col_gene_data = gene_to_data[col_gene_name]
 			
 			X = [None] * (len(row_gene_data) +len(col_gene_data))
-			Y = [0] * (len(row_gene_data) +len(col_gene_data))
+			Y = [1] * (len(row_gene_data) +len(col_gene_data))
+
 
 			for k in xrange(0, len(row_gene_data)):
 				X[k] = row_gene_data[k]
 			k += 1
 			for l in xrange(0, len(col_gene_data)):
 				X[k + l] = col_gene_data[l]
-				Y[k + l] = 1
+				Y[k + l] = 0
 			assert X[-1] is not None
-			assert Y[-1] != 0 
+			assert Y[-1] != 1
+			X = preprocessing.scale(X)
 
+			clf = svm.SVC(tol=float(1e-10), max_iter=float(1e6), kernel='linear')
 			clf.fit(X, Y)
+
 
 			accuracy = 0
 
 			for k in xrange(0, len(row_gene_data)):
-				if clf.predict([row_gene_data[k]])[0] == 0:
+				if clf.predict([row_gene_data[k]])[0] == 1:
 					accuracy += 1
 
 			for k in xrange(0, len(col_gene_data)):
-				if clf.predict([col_gene_data[k]])[0] == 1:
+				if clf.predict([col_gene_data[k]])[0] == 0:
 					accuracy += 1
 
 			distance_metric[i][j] = accuracy * 1.0 / (len(row_gene_data) +len(col_gene_data))
+
+with open('./svm_metric_gene_names.txt', 'w') as output_gene_name_file:
+	for i in xrange(0, try_count):
+		gene_name = all_sample_genes[i]
+		output_gene_name_file.write('{0}\n'.format(gene_name))
+
+with open('./svm_metric_result.csv', 'w') as output_distance:
+	for i in xrange(0, try_count):
+		for j in xrange(0, try_count):
+			if j == try_count - 1:
+				output_distance.write("{0}\n".format(distance_metric[i][j]))
+			else:
+				output_distance.write("{0},".format(distance_metric[i][j]))
+
+
+
+
+
