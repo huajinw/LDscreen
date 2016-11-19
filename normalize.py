@@ -12,7 +12,6 @@ def preprocessor(filename):
 preprocessor('normalize.csv')
 
 	
-	
 
 
 
