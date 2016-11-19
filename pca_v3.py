@@ -2,9 +2,9 @@ from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
 
-n = 20	# number of components
+n = 40	# number of components
 
-data = np.loadtxt('final2.csv',delimiter=',')
+data = np.loadtxt('outnormalize.csv',delimiter=',')
 data = np.nan_to_num(data)
 pca = PCA(n_components = n)
 result = pca.fit(data).transform(data)
