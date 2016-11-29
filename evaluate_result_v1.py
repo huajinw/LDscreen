@@ -6,9 +6,9 @@ NEGATIVE_LINE_COUNT = 29232
 SAMPLE_LINE_COUNT = 380471
 
 start_k = 2
-end_k = 10
+end_k = 20
 
-data = np.loadtxt('kmeans_2-10.txt')
+data = np.loadtxt('kmeans_no_pca_2-20.txt', delimiter = ',')
 
 n_samples, n_features = data.shape
 print(data.shape)
@@ -26,9 +26,9 @@ for k in range(start_k,end_k+1):
 	for i in range(n_samples):
 		if i <= POS_1_LINE_COUNT: 
 			cat = 'pos1'
-		elif POS_1_LINE_COUNT < i <= POS_2_LINE_COUNT:
+		elif POS_1_LINE_COUNT < i <= POS_1_LINE_COUNT + POS_2_LINE_COUNT:
 			cat = 'pos2' 
-		elif POS_2_LINE_COUNT < i <= NEGATIVE_LINE_COUNT:
+		elif POS_1_LINE_COUNT + POS_2_LINE_COUNT < i <= POS_1_LINE_COUNT+ POS_2_LINE_COUNT+ NEGATIVE_LINE_COUNT:
 			cat = 'neg'
 		else:
 			cat = 'unknown'
