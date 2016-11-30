@@ -4,12 +4,12 @@ N = 438928;
 data = csvread('pca_minimized_17.csv');
 size(data)
 X = data(1:N,:);
-mu = randn(K,d);
+Mu = randn(K,d);
 for k = 1:K
     Sigma(:,:,k) = eye(d);
 end
 %Sigma = randn(d,d,K);
-pi = 1/K * ones(1,K);
+Pi = 1/K * ones(1,K);
 
 gamma = zeros(N,K);
 iter = 0;
@@ -22,7 +22,7 @@ while true
         x_i = X(i,:);
         row_sum = 0;
         for k = 1 : K
-            tmp_density = mvnpdf(x_i, mu(k,:), Sigma(:,:,k));
+            tmp_density = mvnpdf(x_i, Mu(k,:), Sigma(:,:,k));
             row_sum = row_sum + tmp_density;
             gamma(i, k) = tmp_density;
         end
@@ -44,7 +44,7 @@ while true
              mu_tmp = mu_tmp + gamma(n,k) * X(n, :);
          end
          mu_tmp = 1 / N_k(k) * mu_tmp;
-         mu(k, :) = mu_tmp;
+         Mu(k, :) = mu_tmp;
          
          % get new sigma_k
          for n=1:N
@@ -55,8 +55,14 @@ while true
          sigma_tmp = 1 / N_k(k) * sigma_tmp;
          Sigma(:,:,k) = sigma_tmp;
          
-         pi(k) = 1 / N_k(k) / N;
+         Pi(k) = 1 / N_k(k) / N;
      end
 
     iter = iter + 1
+    
+    if mod(iter, 20) == 0
+        dlmwrite(sprintf('Pi_%d.txt', iter), Pi);
+        dlmwrite(sprintf('Sigma_%d.txt', iter),Sigma);
+        dlmwrite(sprintf('Mu_%d.txt', iter), Mu);
+    end
 end
