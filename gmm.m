@@ -1,7 +1,7 @@
 K = 10;
 d = 17;
 N = 438928;
-% N = 3000;
+% N = 30000;
 data = csvread('pca_minimized_17.csv');
 
 X = data(1:N,:);
@@ -61,9 +61,12 @@ while true
     iter = iter + 1
     
     % output
-    if mod(iter, 20) == 0
+    if mod(iter, 5) == 0
         dlmwrite(sprintf('Pi_%d.txt', iter), Pi);
-        dlmwrite(sprintf('Sigma_%d.txt', iter),Sigma);
         dlmwrite(sprintf('Mu_%d.txt', iter), Mu);
+        mkdir(sprintf('./Sigmas_%d/', iter))
+        for k = 1:K
+            dlmwrite(sprintf('./Sigmas_%d/covariance_%d.txt', iter, k),Sigma(:,:,k));
+        end
     end
 end
