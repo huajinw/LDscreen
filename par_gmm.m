@@ -5,7 +5,7 @@ N = 438928;
 data = csvread('pca_minimized_17.csv');
 size(data)
 X = data(1:N,:);
-Mu = randn(K,d);
+Mu = dlmread('./k10/Mu_kmeans.txt');
 for k = 1:K
     Sigma(:,:,k) = eye(d);
 end
